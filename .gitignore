@@ -1,6 +1,7 @@
 credentials.rb
-test.json
+*.json
 .DS_Store
 
 #emacs temp files
 *~
+*#
