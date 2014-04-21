@@ -1,5 +1,5 @@
 credentials.rb
-*.json
+data
 .DS_Store
 
 #emacs temp files

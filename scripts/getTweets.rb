@@ -36,7 +36,7 @@ end
 
 # might not be the best way to load JSON from file and add new results to exisiting results
 previousArray = []
-previousArray = JSON.parse(File.read("test.json"))
+previousArray = JSON.parse(File.read("../data/test.json"))
 
 finalArray = testArray + previousArray
 
@@ -45,4 +45,4 @@ puts previousArray.count
 puts finalArray.count
 
 # overwrites last file
-File.open("test.json", "w").write(JSON.pretty_generate(finalArray))
+File.open("../data/test.json", "w").write(JSON.pretty_generate(finalArray))
