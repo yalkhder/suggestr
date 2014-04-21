@@ -27,7 +27,7 @@ client = Twitter::REST::Client.new(@config)
     searchTerm += " OR " + commonWords.sample
   end
   puts searchTerm
-  searchResult = client.search(commonWords.sample,
+  searchResult = client.search(searchTerm,
                                {:lang  =>  'en'})
   searchResult.each do |tweet|
     testArray << tweet.attrs
