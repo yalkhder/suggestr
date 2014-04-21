@@ -30,13 +30,26 @@ client = Twitter::REST::Client.new(@config)
   searchResult = client.search(searchTerm,
                                {:lang  =>  'en'})
   searchResult.each do |tweet|
-    testArray << tweet.attrs
+    if tweet.hashtags?
+      hashtags = []
+      tweet.hashtags.each do |hashtag|
+        hashtags << hashtag.text
+      end
+      cleanedUpTweet = { 
+        :id       =>  tweet.id,
+        :text     =>  tweet.text,
+        :hashtags =>  hashtags,
+        :user_id  =>  tweet.user.id,
+        :source   =>  tweet.source
+      }
+      testArray << cleanedUpTweet
+    end
   end
 end
 
 # might not be the best way to load JSON from file and add new results to exisiting results
 previousArray = []
-previousArray = JSON.parse(File.read("../data/test.json"))
+previousArray = JSON.parse(File.read("../data/test.json")) if File.exists?("../data/test.json")
 
 finalArray = testArray + previousArray
 
