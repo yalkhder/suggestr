@@ -1,4 +1,4 @@
-#suggestr
+\#suggestr
 ========
 
 The hashtag suggester
