@@ -35,7 +35,7 @@ client = Twitter::REST::Client.new(@config)
       tweet.hashtags.each do |hashtag|
         hashtags << hashtag.text
       end
-      cleanedUpTweet = { 
+      cleanedUpTweet = {
         :id       =>  tweet.id,
         :text     =>  tweet.text,
         :hashtags =>  hashtags,
