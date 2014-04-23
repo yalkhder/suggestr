@@ -21,41 +21,49 @@ commonWords = [ "the", "be","to", "of", "and", "a", "in", "that", "have",
               ];
 
 client = Twitter::REST::Client.new(@config)
-10.times do
+loop do
   searchTerm = commonWords.sample
   9.times do
     searchTerm += " OR " + commonWords.sample
   end
   puts searchTerm
-  searchResult = client.search(searchTerm,
-                               {:lang  =>  'en'})
-  searchResult.each do |tweet|
-    if tweet.hashtags?
-      hashtags = []
-      tweet.hashtags.each do |hashtag|
-        hashtags << hashtag.text
+  begin
+    searchResult = client.search(searchTerm,
+                                 {:lang  =>  'en'})
+    searchResult.each do |tweet|
+      if tweet.hashtags?
+        hashtags = []
+        tweet.hashtags.each do |hashtag|
+          hashtags << hashtag.text
+        end
+        cleanedUpTweet = {
+          :id       =>  tweet.id,
+          :text     =>  tweet.text,
+          :hashtags =>  hashtags,
+          :user_id  =>  tweet.user.id,
+          :source   =>  tweet.source
+        }
+        testArray << cleanedUpTweet
       end
-      cleanedUpTweet = {
-        :id       =>  tweet.id,
-        :text     =>  tweet.text,
-        :hashtags =>  hashtags,
-        :user_id  =>  tweet.user.id,
-        :source   =>  tweet.source
-      }
-      testArray << cleanedUpTweet
     end
+  rescue
+    if testArray.count > 0
+      # might not be the best way to load JSON from file and add new results to exisiting results
+      previousArray = []
+      previousArray = JSON.parse(File.read("../data/test.json")) if File.exists?("../data/test.json")
+
+      finalArray = testArray + previousArray
+
+      puts testArray.count
+      puts previousArray.count
+      puts finalArray.count
+
+      # overwrites last file
+      File.open("../data/test.json", "w").write(JSON.pretty_generate(finalArray))
+    end
+    testArray = []
+    puts "sleeping"
+    #sleep for 1 minute.
+    sleep(60)
   end
 end
-
-# might not be the best way to load JSON from file and add new results to exisiting results
-previousArray = []
-previousArray = JSON.parse(File.read("../data/test.json")) if File.exists?("../data/test.json")
-
-finalArray = testArray + previousArray
-
-puts testArray.count
-puts previousArray.count
-puts finalArray.count
-
-# overwrites last file
-File.open("../data/test.json", "w").write(JSON.pretty_generate(finalArray))
