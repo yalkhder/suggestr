@@ -4,7 +4,6 @@ require_relative 'credentials'
 
 client = Twitter::REST::Client.new(@config)
 username = ARGV.first
-
 options = { :count  =>  3200, :include_rts  =>  false }
 allUserTweets = []
 
@@ -17,7 +16,7 @@ while (true)
       tweet.hashtags.each do |hashtag|
         hashtags << hashtag.text
       end
-      cleanedUpTweet = { 
+      cleanedUpTweet = {
         :id       =>  tweet.id,
         :text     =>  tweet.text,
         :hashtags =>  hashtags,
