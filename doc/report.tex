@@ -436,31 +436,68 @@ The abstract goes here. The abstract goes here. The abstract goes here. The abst
 
 
 \section{Introduction}
-This is introduction. This is introduction. This is introduction. This is introduction. This is introduction. This is introduction. This is introduction. This is introduction. This is introduction. This is introduction. This is introduction. This is introduction. This is introduction. This is introduction. This is introduction. This is introduction. This is introduction.
+With more than 100 million active daily users, and around 500 million posts, known as “tweets”, per day, Twitter is one of the largest social networks and blogging platforms, and a pioneer of the “microblogging” phenomenon. With its 140 characters per post limit, tweets are much shorter and concise compared to traditional blog entries. \\
+
+One of the most prominent and well-known features of Twitter is the hashtag. In Twitter, a hashtag is a set of characters, usually a word or several words, preceded by the hash symbol (\#). Hashtags serve several purposes in Twitter. Much like tags in traditional blogs and documents, and keywords in articles, hashtags allow users to categorize their tweets. This allows for tweets to be easily searched and analyzed based on tweets. Not all hashtags are used for tagging and categorization purposes. Many users add hashtags to their tweets in order to convey context and emotion, as well as enhance the tweeting experience in general. \\
+
+This paper proposes the feasibility and the effectiveness of a building a hashtag suggester using machine intelligence techniques. To be more precise, a naïve Bayes classifier is proposed to implement the hashtag suggester. Naïve Bayes classifiers have been successfully used in the past for document categorization. The team suggests using a similar technique for suggesting hashtags.
 
 
-\subsection{Subsection Heading Here}
-Subsection text here. Subsection text here. Subsection text here. Subsection text here. Subsection text here. Subsection text here. Subsection text here. Subsection text here.
+\section{Data Gathering}
+Twitter has a strong and easy to use application programming interface (API) for searching and retrieving tweets in a structured format. A script was used to search and retrieve tweets that included the most common words in the English language, such as “a”, “the”, and “or”. The script retrieved more than 300,000 thousand tweets that included hashtags. Another script was used to retrieve all tweets from a single user. This was used to train the classifier based on a user which is hypothesized to improve the performance of the classifier.
 
 
-\subsubsection{Subsubsection Heading Here}
-Subsubsection text here. Subsubsection text here. Subsubsection text here. Subsubsection text here. Subsubsection text here. Subsubsection text here. Subsubsection text here. Subsubsection text here. Subsubsection text here. Subsubsection text here.
+\section{Pre-processing}
+The data retrieved from Twitter is fairly large, noisy, and contains a good amount of information that is not needed for building the classifier. Therefore the data needed to be cleaned before being used. \\
 
-Sample Figure: Look at Fig. \ref{fig_ANN}.
+Firstly, tweets that did not include hashtags were discarded as they serve no purpose in building the suggester. This was done in the retrieval script as it searched for tweets. \\
 
-\begin{figure}[htb]
-\centering
-\includegraphics[width=2in]{ANN.jpeg}
-\caption{This is a sample figure.}
-\label{fig_ANN}
-\end{figure}
+The data that is sent back from Twitter contains many fields that are irrelevant to the suggester, such as profile picture URL and timestamp of tweet. While it was not necessary to extract the relative fields only, it is very beneficial to do so as it reduces the file size and processing time when it comes to building the classifier. After extracting only the required fields, the data was reduced to 5\% of the original file size. \\
 
-This is a sample equation:
+After that, efforts were focused on cleaning up the contents of the tweets (i.e. the text of the tweet). Tweets are very noisy in general. Other than the 140 character limit, there are virtually no other restrictions on the contents of the tweet. Several steps were taken to clean the tweets so that the classifier can use them appropriately. Firstly, URLs were removed from the tweets. Next, common words that don’t provide meaning or context were removed. Words such as “the”, “be”, and “to” are some of the most common words in the English language which can be found in any tweet regardless of the nature of the tweet, and more importantly the hashtags used with the tweet. This renders them practically useless for the classifier. Another feature that was removed from tweets is “mentions”. Mention is a feature in Twitter to tag users by preceding their username with the “@” symbol. Hashtags were also removed from tweets as not to include them in our feature set in the classifier. Twitter provides the hashtags used in the tweet in a separate field so removing hashtags from the tweets without losing them was relatively simple. Finally, non-alphabetic characters were removed and the remaining text was converted to lowercase. This prevents the classifier from registering the same word as different features due to capitalization and punctuation. \\
+
+One important thing to note about the cleaning of tweets is the fact that non-words (slang, acronyms, or plain gibberish) were not removed from the tweets. Removing such “words” would provide much cleaner dataset that only includes legitimate English words. However, Twitter does not restrict the contents of the tweet, and thus many users use slang words or terms that would help in categorizing the tweet. \\
+
+\section{Building the Classifier}
+\subsection{Theory}
+As mentioned previously, a naïve Bayes model was used to build the classifier. In its simplest form, the classifier will suggest the hashtag with the highest posterior given a set of words (i.e. the tweet). Equation (1) shows how Bayes rule can be used to calculate the posterior of a hashtag given a set of words.
 \begin{equation}
-f(x) = \frac{\sin(x^2)-1}{\sum\limits_{i=1}^{n}i^3-i}+\log_2 x
+  p(x) = \frac{\sin(x^2)-1}{\sum\limits_{i=1}^{n}i^3-i}+\log_2 x
 \end{equation}
 
-This is a sample reference: Look at \cite{IEEEhowto:kopka}.
+Where $C_i$ represents the ith hashtag and {x} represents the set of words in the tweet. Since naïve Bayes assumes independence of features, i.e. the probability of a word in a class is not affected by the other words in the set. The likelihood probability of a set of words {x} belonging to a hashtag $C_i$ can be represented as the product of the likelihood probability of each word belonging to that hashtag. Equation (2) shows this relation.
+\begin{equation}
+  p(x) = \frac{\sin(x^2)-1}{\sum\limits_{i=1}^{n}i^3-i}+\log_2 x
+\end{equation}
+
+The prior $p(C_i)$ will be equal for all hashtags and the term p({x}) will be discarded as it is independent of the hashtag being considered. This will result in a maximum likelihood (ML) probability for the classifier. The prior gives a great opportunity to weigh the hashtags differently. Hashtags can be weighed differently if they are more common to a user, or if they are trending for example. Section X (future considerations) will go into more details.
+
+\subsection{Application}
+
+\section{Future Considerations}
+\subsection{Building Datasets}
+The feature set is built by iterating through the words in the processed tweets and adding the word to the set if it doesn’t exist in the set already. The same method is used to build the set of hashtags to consider. This makes our sets very large with a large number of features rarely occurring in our classes. One way to solve this is to only add a word to the feature set if it occurs over a certain threshold. The same can be done with hashtags. This is not particularly difficult to accomplish and will produce smaller data sets with more common words and suggestions. It is highly recommended to implement this in the future.
+
+\subsection{More Rigorous Pre Processing}
+\subsection{Weighting Priors}
+\subsection{Using Live Data}
+\subsection{Multiple Hashtags}
+
+%% Sample Figure: Look at Fig. \ref{fig_ANN}.
+
+%% \begin{figure}[htb]
+%% \centering
+%% \includegraphics[width=2in]{ANN.jpeg}
+%% \caption{This is a sample figure.}
+%% \label{fig_ANN}
+%% \end{figure}
+
+%% This is a sample equation:
+%% \begin{equation}
+%% f(x) = \frac{\sin(x^2)-1}{\sum\limits_{i=1}^{n}i^3-i}+\log_2 x
+%% \end{equation}
+
+%% This is a sample reference: Look at \cite{IEEEhowto:kopka}.
 
 \section{Conclusion}
 The conclusion goes here. The conclusion goes here. The conclusion goes here. The conclusion goes here. The conclusion goes here. The conclusion goes here. The conclusion goes here. The conclusion goes here. The conclusion goes here.
