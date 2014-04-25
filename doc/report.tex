@@ -462,12 +462,12 @@ One important thing to note about the cleaning of tweets is the fact that non-wo
 \subsection{Theory}
 As mentioned previously, a naïve Bayes model was used to build the classifier. In its simplest form, the classifier will suggest the hashtag with the highest posterior given a set of words (i.e. the tweet). Equation (1) shows how Bayes rule can be used to calculate the posterior of a hashtag given a set of words.
 \begin{equation}
-  p(x) = \frac{\sin(x^2)-1}{\sum\limits_{i=1}^{n}i^3-i}+\log_2 x
+  p(C_i|\{x\}) = \frac{p(\{x\}|C_i)p(C_i)}{p(\{x\})}
 \end{equation}
 
 Where $C_i$ represents the ith hashtag and {x} represents the set of words in the tweet. Since naïve Bayes assumes independence of features, i.e. the probability of a word in a class is not affected by the other words in the set. The likelihood probability of a set of words {x} belonging to a hashtag $C_i$ can be represented as the product of the likelihood probability of each word belonging to that hashtag. Equation (2) shows this relation.
 \begin{equation}
-  p(x) = \frac{\sin(x^2)-1}{\sum\limits_{i=1}^{n}i^3-i}+\log_2 x
+  p(\{x\}|C_i) = \prod_{i=1}^Np(x_i|C_i)
 \end{equation}
 
 The prior $p(C_i)$ will be equal for all hashtags and the term p({x}) will be discarded as it is independent of the hashtag being considered. This will result in a maximum likelihood (ML) probability for the classifier. The prior gives a great opportunity to weigh the hashtags differently. Hashtags can be weighed differently if they are more common to a user, or if they are trending for example. Section X (future considerations) will go into more details.
