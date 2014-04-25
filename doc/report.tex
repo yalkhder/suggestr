@@ -473,6 +473,19 @@ The prior $p(C_i)$ will be equal for all hashtags and the term p({x}) will be di
 
 \subsection{Application}
 
+The classifier itself was built in MATLAB using the builtin NaiveBayes class. This class provides an easy to use interface that creates a classifier given a set of labelled features, and to then use this classifier to predict the label of a given feature set.
+
+\section{Results}
+Upon using 70\% of the original 300000 tweets to build a classifier in MATLAB, major performance issues were encountered. When reducing the number of tweets to even 3000, these issues remained persistent. To resolve this, feature reduction was done on on the original data. Initially, any non-common word was used as a feature, resulting in a 90000-dimension problem. This was reduced to a 2710 dimension problem by only including words that occurred at least 100 times in the entire data set. \\
+
+After dimension-reduction, performance issues still occurred when trying to build a classifier using all 300000 tweets. Upon reducing this to about 16000 tweets however, it became possible to build a working classifier. \\
+
+With an abundance of unused tweets to test with, this classifier was then tested with 34000 tweets. It was found that this had a success rate of about 11\%. This is lower than results in prior research, that have success of up to 70\%, however these results have a much more reduced scope than what was used within this project, suggesting up to 20 possible hashtags for a given tweet, and only having a pool of about 50 to choose from. \\
+
+As test data was collected all on one day, which happened to be Earth Day, it was very evident that suggested hashtags were biased towards trending tweets of the day, in this case, \#EarthDay. This could be useful in a more parctical hashtag suggester, as it could use more dynamic training data, and produce more relevant data for a given context. This can be extended further into selecting more relevant tweets, possibly from the user's tweet history, or his/her followers. \\
+
+The test setup does not account for tweets that have similar hashtags suggested. For example, the hashtag, \#EarthDay was suggested when \#HappyEarthDay was actually used. In addition to this, it only considers the first hashtag of a tweet to be its label, disgarding any further hashtags. As such, the resulting success rate appears to be much worse than it actually is.
+
 \section{Future Considerations} \label{sec:future}
 \subsection{Building Datasets}
 The feature set is built by iterating through the words in the processed tweets and adding the word to the set if it doesn’t exist in the set already. The same method is used to build the set of hashtags to consider. This makes our sets very large with a large number of features rarely occurring in our classes. One way to solve this is to only add a word to the feature set if it occurs over a certain threshold. The same can be done with hashtags. This is not particularly difficult to accomplish and will produce smaller data sets with more common words and suggestions. It is highly recommended to implement this in the future.
