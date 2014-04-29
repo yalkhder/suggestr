@@ -351,7 +351,7 @@
 %
 % paper title
 % can use linebreaks \\ within to get better formatting as desired
-\title{SYDE 522: Machine Intelligence}
+\title{Hashtag Suggestion Using Na\"{i}ve Bayes Classification}
 
 
 % author names and affiliations
@@ -407,7 +407,8 @@ Email: \{yyalkhde, sbkraeme\}@uwaterloo.ca}
 
 
 \begin{abstract}
-The abstract goes here. The abstract goes here. The abstract goes here. The abstract goes here. The abstract goes here. The abstract goes here.
+The purpose of this project is to suggest tags to micro-blogging text. In particular, it aims at suggesting hashtags to Twitter micro-blogging updates, known as ``tweets''. Prior art tends to use Na\"{i}ve Bayes or similar classifiers for similar applications. As such, a Na\"{i}ve Bayes classifier will be used in this project. This project differs mainly from prior art in that it does less pre-processing on data, and removes less features. In addition, it uses data collected from a narrow window in time, making training data more relevant to tested results. This gives a more accurate model of how a practical hashtag suggester would perform. The expected outcome of the project is a system that is capable of suggesting appropriate hashtags to a Twitter user when given a tweet they are to post.
+
 \end{abstract}
 
 % IEEEtran.cls defaults to using nonbold math in the Abstract.
@@ -435,36 +436,46 @@ The abstract goes here. The abstract goes here. The abstract goes here. The abst
 
 
 \section{Introduction}
-With more than 100 million active daily users, and around 500 million posts, known as ``tweets'', per day, Twitter is one of the largest social networks and blogging platforms, and a pioneer of the ``microblogging'' phenomenon. With its 140 characters per post limit, tweets are much shorter and concise compared to traditional blog entries. \\
+Blogs, short for web logs, have existed since the early days of the Internet, with blogs appearing on the World Wide Web since the early 1990s. With more than 100 million active daily users, and around 500 million posts, known as ``tweets'', per day, Twitter is one of the largest social networks and blogging platforms, and a pioneer of the ``microblogging'' phenomenon. With its 140 characters per post limit, tweets are much shorter and concise compared to traditional blog entries. As such, it has a very large amount of easy to use data, making it a commonly targeted platform for Machine Intelligence research. \\
 
 One of the most prominent and well-known features of Twitter is the hashtag. In Twitter, a hashtag is a set of characters, usually a word or several words, preceded by the hash symbol (\#). Hashtags serve several purposes in Twitter. Much like tags in traditional blogs and documents, and keywords in articles, hashtags allow users to categorize their tweets. This allows for tweets to be easily searched and analyzed based on tweets. Not all hashtags are used for tagging and categorization purposes. Many users add hashtags to their tweets in order to convey context and emotion, as well as enhance the tweeting experience in general. \\
 
-This paper proposes the feasibility and the effectiveness of a building a hashtag suggester using machine intelligence techniques. To be more precise, a naïve Bayes classifier is proposed to implement the hashtag suggester. Naïve Bayes classifiers have been successfully used in the past for document categorization. The team suggests using a similar technique for suggesting hashtags.
+This paper proposes the feasibility and the effectiveness of a building a hashtag suggester using machine intelligence techniques. To be more precise, a na\"{i}ve Bayes classifier is proposed to implement the hashtag suggester. Na\"{i}ve Bayes classifiers have been successfully used in the past for document categorization. The team suggests using a similar technique for suggesting hashtags.
 
+\section{Background}
+Hashtags serve many purposes within Twitter. Chang and Iyer \cite{chang} suggest that hashtags aid in archiving contents, provide visual representations of tweets, and allow tweets to be grouped into different categories. Due to the capabilities and cleanliness of the Twitter API, and the archiving and categorizing abilities of hashtags, academics have used data from Twitter in many fields of research.
+
+Pennacchiotti and Popescu from Yahoo! Labs \cite{marco} used data from tweets in order to categorize users based on political standpoint, ethnicity, and affinity for a business. Cheng et al. from Texas A\&M University \cite{cheng} were able to locate users’ location within 100 miles with a 51\% accuracy based solely on the content of the tweet (without using IP address or geo-location data). Go et al. from Stanford University \cite{go} were able to classify sentiment of tweets based on a query with more than 80\% accuracy using machine learning algorithms.
+
+It is evident that the data from Twitter, with support of hashtags, is a powerful tool, given that Twitter has such an enormous set of data, and an open API which greatly simplifies data acquisition. As such the team found it beneficial to have a tool that would suggest a set of hashtags to use based on the content of the tweet.
+
+There have been several attempts to build an agent that would predict or suggest the most appropriate hashtag given a tweet. Mazzia and Juett from the University of Michigan \cite{mazzia} explored the use of naïve Bayes classifier for the purpose of suggesting tweets with promising results. Ding et al from Fudan University \cite{huang} propose topic-specific translation model to suggest hashtags for microblogs such as Twitter, and claim that an agent built using this model can outperform some of state-of-the-art methods, including naïve Bayes.
+
+While the concept of microblogging and hashtags is relatively new, text categorization using machine intelligence has been around for much longer. McCallum and Nigam \cite{mccallum} discussed using naïve Bayes classifiers for text classification in 1998. It has therefore been hypothesized that similar techniques can be used to suggest hashtags by categorizing the text of a tweet. It is interesting to note the differences between traditional text categorizing, and classification of microblogs or tweets, such as length of text, and how traditional techniques may not be as effective, as Sriram et al. have discussed \cite{sriram}.
 
 \section{Data Gathering}
-Twitter has a strong and easy to use application programming interface (API) for searching and retrieving tweets in a structured format. A script was used to search and retrieve tweets that included the most common words in the English language, such as ``a'', ``the'', and ``or''. The script retrieved more than 300,000 thousand tweets that included hashtags. Another script was used to retrieve all tweets from a single user. This was used to train the classifier based on a user which is hypothesized to improve the performance of the classifier.
+Twitter has a strong and easy to use application programming interface (API) for searching and retrieving tweets in a structured format. A script (Appendix 1) was used to search and retrieve tweets that included the most common words in the English language, such as ``a'', ``the'', and ``or''. The script retrieved more than 300,000 tweets that included hashtags. This was used to train the classifier based on a user which is hypothesized to improve the performance of the classifier.
 
 
 \section{Pre-processing}
 The data retrieved from Twitter is fairly large, noisy, and contains a good amount of information that is not needed for building the classifier. Therefore the data needed to be cleaned before being used. \\
 
-Firstly, tweets that did not include hashtags were discarded as they serve no purpose in building the suggester. This was done in the retrieval script as it searched for tweets. \\
+Firstly, tweets that did not include hashtags were discarded as they serve no purpose in building the suggester. This was done in the retrieval script as it searched for tweets. (see Appendix 1) \\
 
 The data that is sent back from Twitter contains many fields that are irrelevant to the suggester, such as profile picture URL and timestamp of tweet. While it was not necessary to extract the relative fields only, it is very beneficial to do so as it reduces the file size and processing time when it comes to building the classifier. After extracting only the required fields, the data was reduced to 5\% of the original file size. \\
 
-After that, efforts were focused on cleaning up the contents of the tweets (i.e. the text of the tweet). Tweets are very noisy in general. Other than the 140 character limit, there are virtually no other restrictions on the contents of the tweet. Several steps were taken to clean the tweets so that the classifier can use them appropriately. Firstly, URLs were removed from the tweets. Next, common words that don’t provide meaning or context were removed. Words such as ``the'', ``be'', and ``to'' are some of the most common words in the English language which can be found in any tweet regardless of the nature of the tweet, and more importantly the hashtags used with the tweet. This renders them practically useless for the classifier. Another feature that was removed from tweets is ``mentions''. Mention is a feature in Twitter to tag users by preceding their username with the ``@'' symbol. Hashtags were also removed from tweets as not to include them in our feature set in the classifier. Twitter provides the hashtags used in the tweet in a separate field so removing hashtags from the tweets without losing them was relatively simple. Finally, non-alphabetic characters were removed and the remaining text was converted to lowercase. This prevents the classifier from registering the same word as different features due to capitalization and punctuation. \\
+After that, efforts were focused on cleaning up the contents of the tweets (i.e. the text of the tweet). Tweets are very noisy in general. Other than the 140 character limit, there are virtually no other restrictions on the contents of the tweet. Several steps were taken to clean the tweets so that the classifier can use them appropriately. Firstly, URLs were removed from the tweets. Next, common words that don’t provide meaning or context were removed. Words such as ``the'', ``be'', and ``to'' are some of the most common words in the English language which can be found in any tweet regardless of the nature of the tweet, and more importantly the hashtags used with the tweet. This renders them practically useless for the classifier. Another feature that was removed from tweets is ``mentions''. Mention is a feature in Twitter to tag users by preceding their username with the ``@'' symbol. Hashtags were also removed from tweets as not to include them in our feature set in the classifier. Twitter provides the hashtags used in the tweet in a separate field so removing hashtags from the tweets without losing them was relatively simple. Finally, non-alphabetic characters were removed and the remaining text was converted to lowercase. This prevents the classifier from registering the same word as different features due to capitalization and punctuation. This cleanup function can be found in Appendix 2. \\
 
-One important thing to note about the cleaning of tweets is the fact that non-words (slang, acronyms, or plain gibberish) were not removed from the tweets. Removing such ``words'' would provide much cleaner dataset that only includes legitimate English words. However, Twitter does not restrict the contents of the tweet, and thus many users use slang words or terms that would help in categorizing the tweet. \\
+One important thing to note about the cleaning of tweets is the fact that non-words (slang, acronyms, or plain gibberish) were not removed from the tweets. Removing such ``words'' would provide much cleaner dataset that only includes legitimate English words. However, Twitter does not restrict the contents of the tweet, and thus many users use slang words or terms that would help in categorizing the tweet. Particularly noisy slang terms that were used infrequently were removed in the feature extraction stage however, as any word that occurred less than 100 times was removed from the feature set. This functionality can be seen in Appendix 3.\\
 
 \section{Building the Classifier}
 \subsection{Theory}
-As mentioned previously, a naïve Bayes model was used to build the classifier. In its simplest form, the classifier will suggest the hashtag with the highest posterior given a set of words (i.e. the tweet). Equation~\ref{eq:bayes} shows how Bayes rule can be used to calculate the posterior of a hashtag given a set of words.
+As mentioned previously, a na\"{i}ve Bayes model was used to build the classifier. In its simplest form, the classifier will suggest the hashtag with the highest posterior given a set of words (i.e. the tweet). Equation~\ref{eq:bayes} shows how Bayes rule can be used to calculate the posterior of a hashtag given a set of words.
 \begin{equation} \label{eq:bayes}
   p(C_i|\{x\}) = \frac{p(\{x\}|C_i)p(C_i)}{p(\{x\})}
 \end{equation}
 
-Where $C_i$ represents the ith hashtag and {x} represents the set of words in the tweet. Since naïve Bayes assumes independence of features, i.e. the probability of a word in a class is not affected by the other words in the set. The likelihood probability of a set of words {x} belonging to a hashtag $C_i$ can be represented as the product of the likelihood probability of each word belonging to that hashtag. Equation~\ref{eq:naive} shows this relation.
+Where $C_i$ represents the ith hashtag and {x} represents the set of words in the tweet. Since na\"{i}ve Bayes assumes independence of features, i.e. the probability of a word in a class is not affected by the other words in the set. The likelihood probability of a set of words {x} belonging to a hashtag $C_i$ can be represented as the product of the likelihood probability of each word belonging to that hashtag. Equation~\ref{eq:naive} shows this relation.
 \begin{equation} \label{eq:naive}
   p(\{x\}|C_i) = \prod_{i=1}^Np(x_i|C_i)
 \end{equation}
@@ -476,24 +487,38 @@ The prior $p(C_i)$ will be equal for all hashtags and the term p({x}) will be di
 The classifier itself was built in MATLAB using the builtin NaiveBayes class. This class provides an easy to use interface that creates a classifier given a set of labelled features, and to then use this classifier to predict the label of a given feature set.
 
 \section{Results}
-Upon using 70\% of the original 300000 tweets to build a classifier in MATLAB, major performance issues were encountered. When reducing the number of tweets to even 3000, these issues remained persistent. To resolve this, feature reduction was done on on the original data. Initially, any non-common word was used as a feature, resulting in a 90000-dimension problem. This was reduced to a 2710 dimension problem by only including words that occurred at least 100 times in the entire data set. \\
+Upon using 70\% of the original 300,000 tweets to build a classifier in MATLAB, major performance issues were encountered. When reducing the number of tweets to even 3000, these issues remained persistent. To resolve this, feature reduction was done on on the original data. Initially, any non-common word was used as a feature, resulting in a 90,000-dimension problem. This was reduced to a 2710 dimension problem by only including words that occurred at least 100 times in the entire data set. \\
 
-After dimension-reduction, performance issues still occurred when trying to build a classifier using all 300000 tweets. Upon reducing this to about 16000 tweets however, it became possible to build a working classifier. \\
+After dimension-reduction, performance issues still occurred when trying to build a classifier using all 300,000 tweets. Upon reducing this to about 16,000 tweets however, it became possible to build a working classifier. \\
 
-With an abundance of unused tweets to test with, this classifier was then tested with 34000 tweets. It was found that this had a success rate of about 11\%. This is lower than results in prior research, that have success of up to 70\%, however these results have a much more reduced scope than what was used within this project, suggesting up to 20 possible hashtags for a given tweet, and only having a pool of about 50 to choose from. \\
+With an abundance of unused tweets to test with, this classifier was then tested with 34,000 tweets. It was found that this had a success rate of about 11\%. This is lower than results in prior research, that have success of up to 70\%, however these results have a much more reduced scope than what was used within this project, suggesting up to 20 possible hashtags for a given tweet, and only having a pool of about 50 to choose from. \\
 
 As test data was collected all on one day, which happened to be Earth Day, it was very evident that suggested hashtags were biased towards trending tweets of the day, in this case, \#EarthDay. This could be useful in a more parctical hashtag suggester, as it could use more dynamic training data, and produce more relevant data for a given context. This can be extended further into selecting more relevant tweets, possibly from the user's tweet history, or his/her followers. \\
 
 The test setup does not account for tweets that have similar hashtags suggested. For example, the hashtag, \#EarthDay was suggested when \#HappyEarthDay was actually used. In addition to this, it only considers the first hashtag of a tweet to be its label, disgarding any further hashtags. As such, the resulting success rate appears to be much worse than it actually is.
 
 \section{Future Considerations} \label{sec:future}
-\subsection{Building Datasets}
-The feature set is built by iterating through the words in the processed tweets and adding the word to the set if it doesn’t exist in the set already. The same method is used to build the set of hashtags to consider. This makes our sets very large with a large number of features rarely occurring in our classes. One way to solve this is to only add a word to the feature set if it occurs over a certain threshold. The same can be done with hashtags. This is not particularly difficult to accomplish and will produce smaller data sets with more common words and suggestions. It is highly recommended to implement this in the future.
-
+There are many ways to improve the performance of the suggester. This section will discuss the potential improvements that can be made to the agent and the feasibility of each of them.
 \subsection{More Rigorous Pre Processing}
+While a fair amount of pre processing was done to make sure that the data used is clean and usable, there is more that can be done to the data to train the classifier better. The majority, if not all, of the pre-process that was done did not look at the context of the tweet itself. This means that meaningless tweets can still pass through to the classifier.
+
+Another issue is spam tweets and spam accounts. Spam accounts tend to generate similar tweets, if not identical, in very high volumes. This can skew the classifier towards results that are inherently incorrect. Mazzia and Juett have reported a similar problem where the hashtag ``\#jobs'' was being associated with the term “web design” due to several accounts posting large amount of tweets regarding career opportunities in web design. To battle this, Mazzia and Juett implemented an algorithm where the weight of a tweet is based on the number of tweets used from the user. This way tweets from spam accounts are weighted less and the agent is encouraged to use tweets from different users.
 \subsection{Weighting Priors}
-\subsection{Using Live Data}
-\subsection{Multiple Hashtags}
+The final implementation of the classifier assumes equal prior for all hashtags, which reduces the classifier to a maximum likelihood classifier. This is a good start for building a naïve Bayes classifier, as it does not make any assumptions about the hashtags. However, with some learning, the priors can be weighted differently, making the classifier stronger.
+
+The initial idea of the team was to weight the priors based on the occurrence of the hashtag in the user’s previous tweets. The more the user uses a specific hashtag, the more likely they will use the same hashtag again. This proved to be not feasible due to the fact that the classifier needs to be retrained from scratch for each individual user, combined with the fact that training the classifier took around two hours.
+
+Another idea for weighing the priors is to use trending hashtags from Twitter. Trending hashtags, as the name suggests, are the hashtags that are being used the most in a given time. Trending tweets can be global or region specific. Utilizing trending hashtags would allow the classifier to suggest hashtags that are relevant given a specific time. The major issue with using trending Twitter is that classifier needs to retrieve the trending hashtags and retrain itself every time it is being used, which as mentioned previously, takes a lot of time and computational resources.
+
+However, it would still be interesting to see how weighing the priors differently would change the classifier.
+\subsection{Dynamic Data}
+One of the issues of the classifier built was that the data was collected over a small number of days. This resulted in the classifier being skewed towards time specific hashtags. Specifically, the classifier suggested \#earthDay frequently, since a large number of the data was collected on Earth Day. One way to solve this is to collect a larger amount of data over a longer period of time.
+
+An interesting solution to this problem is to leverage these occasion specific hashtags by using dynamic data to train the classifier. This way the classifier is retrained and will be up to date with trending topics and hashtags, which results in a more accurate suggester.
+\subsection{Better Testing Methods}
+For testing the classifier, the team used the NaiveBayes predict function in MATLAB. This function uses the classifier to return the most probable class for given test data. With the large number of classes (hashtags) and the noisy nature of tweets, it can be very difficult to predict a single hashtag that was used in the original tweet. A better approach would be to predict and rank possible hashtags based on their probability, and calculating the accuracy of the classifier by taking the rank of the hashtag used in the original tweet and calculating the mean rank of its suggestions.
+
+User testing would also be beneficial in this scenario. Users will be allowed to write a tweet, and then the user can select an appropriate hashtag from a list of hashtags that are generated by the classifier. This would take more time and effort, as well as a large number of volunteers to test the classifier.
 
 %% Sample Figure: Look at Fig. \ref{fig_ANN}.
 
@@ -511,12 +536,16 @@ The feature set is built by iterating through the words in the processed tweets 
 
 %% This is a sample reference: Look at \cite{IEEEhowto:kopka}.
 
-\section{Conclusion}
-The conclusion goes here. The conclusion goes here. The conclusion goes here. The conclusion goes here. The conclusion goes here. The conclusion goes here. The conclusion goes here. The conclusion goes here. The conclusion goes here.
+\section{Conclusions}
+In conclusion, raw tweets were pulled from Twitter, using hashtags as labels to classify them. Word frequency was used as a feature, with dimension reduction done by removing very uncommon words, as well as very common words. 300,000 tweets were scraped for this project, although only 16,000 were used to build a classifier, and then 34,000 were used to test it due to performance constraints. \\
 
-% use section* for acknowledgement
-\section*{Acknowledgment}
-The authors would like to thank...The authors would like to thank...The authors would like to thank...
+It is recommended to use more rigorous pre-processing, as results were vastly improved by simple pre-processing to remove very uncommon words. It is anticipated that further pre-processing, such as identifying similar words, can be beneficial in suggesting hashtags. \\
+
+It is also recommended to weight priors better, using data from a user's previous tweets, or hashtags used by other users with similar habits to a given user. This can help in producing results better tailored to a particular user. Using live data can help in creating these weights, as well as in creating a better data set. \\
+
+Finally, it is recommended to handle tweets with multiple hashtags better. Correlation between hashtags could be used to better suggest more relevant hashtags, especially when suggesting more than one hashtag for a particular tweet.
+
+
 
 
 % trigger a \newpage just before the given reference
@@ -541,16 +570,26 @@ The authors would like to thank...The authors would like to thank...The authors 
 % <OR> manually copy in the resultant .bbl file
 % set second argument of \begin to the number of references
 % (used to reserve space for the reference number labels box)
-\begin{thebibliography}{1}
+\begin{thebibliography}{8}
 
-\bibitem{IEEEhowto:kopka}
-H.~Kopka and P.~W. Daly, \emph{A Guide to \LaTeX}, 3rd~ed.\hskip 1em plus
-  0.5em minus 0.4em\relax Harlow, England: Addison-Wesley, 1999.
+\bibitem{chang}
+Chang, Hsia-Ching, and Hemalata Iyer. \emph{Trends in Twitter hashtag applications: Design features for value-added dimensions to future library catalogues.} Library Trends 61, no. 1 (2012): 248-258.
+\bibitem{marco}
+Pennacchiotti, Marco, and Ana-Maria Popescu. \emph{A Machine Learning Approach to Twitter User Classification.} In ICWSM. 2011.
+\bibitem{cheng}
+Cheng, Zhiyuan, James Caverlee, and Kyumin Lee. \emph{You are where you tweet: a content-based approach to geo-locating twitter users.} In Proceedings of the 19th ACM international conference on Information and knowledge management, pp. 759-768. ACM, 2010.
+\bibitem{go}
+Go, Alec, Richa Bhayani, and Lei Huang. \emph{Twitter sentiment classification using distant supervision.} CS224N Project Report, Stanford (2009): 1-12.
+\bibitem{mazzia}
+Mazzia, Allie, and James Juett. \emph{Suggesting hashtags on twitter.} (2009).
+\bibitem{huang}
+Huang, Zhuoye Ding Qi Zhang XuanJing. \emph{Automatic Hashtag Recommendation for Microblogs using Topic-specific Translation Model.}
+\bibitem{mccallum}
+McCallum, Andrew, and Kamal Nigam. \emph{A comparison of event models for naive bayes text classification.} In AAAI-98 workshop on learning for text categorization, vol. 752, pp. 41-48. 1998.
+\bibitem{sriram}
+Sriram, Bharath, Dave Fuhry, Engin Demir, Hakan Ferhatosmanoglu, and Murat Demirbas. \emph{Short text classification in twitter to improve information filtering.} In Proceedings of the 33rd international ACM SIGIR conference on Research and development in information retrieval, pp. 841-842. ACM, 2010.
 
 \end{thebibliography}
-
-
-
 
 % that's all folks
 \end{document}
